@@ -13,7 +13,7 @@ class TokensController < ApplicationController
 
   private
    def encode_token(payload)
-     exp = 86400
+     exp = 86400                # 1 day expiration time
      payload[:exp] = exp.to_i
      JWT.encode(payload, Rails.application.secrets.secret_key_base)
    end
