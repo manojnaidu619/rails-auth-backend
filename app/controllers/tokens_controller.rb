@@ -17,17 +17,10 @@ class TokensController < ApplicationController
   end
 
   def testing
-  #  @token = access_token
     random_integer = rand(1..100)
     render json: {
       integer: random_integer
     }
-  #  logger.info JWT.decode @token,Rails.application.secrets.secret_key_base, true, {algorithm: 'HS256'}
-
-    #render json: {
-    #  integer: random_integer,
-    #  user: current_user.email
-    #}
   end
 
 end

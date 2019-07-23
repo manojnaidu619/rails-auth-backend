@@ -3,14 +3,12 @@ class ApplicationController < ActionController::API
   def auth_user
     @token = request.headers['Authorization']
     if @token.nil?
-      render json: {
-        error: "Missing Token",
-        status: 401
-      }
+      throw_unauthenticated_error
     else
       dtoken = JWT.decode @token,Rails.application.secrets.secret_key_base, true, {algorithm: 'HS256'}
       uid = dtoken[0]['user_id']
-      return User.find_by(id: uid)
+      current_user ||= User.find_by(id: uid)
+      return !current_user.nil? ? (current_user) : (throw_unauthenticated_error)
     end
   end
 
@@ -19,4 +17,10 @@ class ApplicationController < ActionController::API
     return JWT.encode payload, Rails.application.secrets.secret_key_base, 'HS256'
   end
 
+  def throw_unauthenticated_error
+    render json: {
+      error: "Missing Token/unregistered User",
+      status: 401
+    }
+  end
 end
