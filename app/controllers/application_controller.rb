@@ -1,8 +1,17 @@
 class ApplicationController < ActionController::API
 
-  def authenticate
+  def auth_user
     @token = request.headers['Authorization']
-    @token.nil? ? (logger.info 'No value' ) : (logger.info @token)
+    if @token.nil?
+      render json: {
+        error: "Missing Token",
+        status: 401
+      }
+    else
+      dtoken = JWT.decode @token,Rails.application.secrets.secret_key_base, true, {algorithm: 'HS256'}
+      uid = dtoken[0]['user_id']
+      return User.find_by(id: uid)
+    end
   end
 
   def generate_token(user)
@@ -10,10 +19,4 @@ class ApplicationController < ActionController::API
     return JWT.encode payload, Rails.application.secrets.secret_key_base, 'HS256'
   end
 
-  def current_user(token)
-    @token = token
-    dtoken = JWT.decode @token,Rails.application.secrets.secret_key_base, true, {algorithm: 'HS256'}
-    uid = dtoken[0]['user_id']
-    return User.find_by(id: uid)
-  end
 end
