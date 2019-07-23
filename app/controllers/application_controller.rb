@@ -2,6 +2,7 @@ class ApplicationController < ActionController::API
 
   def auth_user
     @token = request.headers['Authorization']
+    logger.info @token
     if @token.nil?
       throw_unauthenticated_error
     else
