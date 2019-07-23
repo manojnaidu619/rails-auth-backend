@@ -3,18 +3,22 @@ class TokensController < ApplicationController
   def create
     @user = User.find_by(email: params[:email])
       if @user and @user.authenticate(params[:password])
+        @token = generate_token(@user)
         render json: {
-          jwt: encode_token({id: @user.id, email: @user.email})
+          jwt: @token
         }
       else
-        head :not_found, status: :bad_request
+        render json: {
+          error: "Invalid username/password",
+          status: 400
+        }
       end
   end
 
   private
-   def encode_token(payload)
-     exp = 86400                # 1 day expiration time
-     payload[:exp] = exp.to_i
-     JWT.encode(payload, Rails.application.secrets.secret_key_base)
+   def generate_token(user)
+     payload = {user_id: user.id}
+     return JWT.encode payload, Rails.application.secrets.secret_key_base, 'HS256'
    end
+   
 end
