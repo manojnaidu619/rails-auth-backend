@@ -1,11 +1,14 @@
 class TokensController < ApplicationController
+  before_action :authenticate
 
   def create
     @user = User.find_by(email: params[:email])
       if @user and @user.authenticate(params[:password])
         @token = generate_token(@user)
+        @user = current_user(@token)
         render json: {
-          jwt: @token
+          jwt: @token,
+          email: @user.email
         }
       else
         render json: {
@@ -15,10 +18,18 @@ class TokensController < ApplicationController
       end
   end
 
-  private
-   def generate_token(user)
-     payload = {user_id: user.id}
-     return JWT.encode payload, Rails.application.secrets.secret_key_base, 'HS256'
-   end
-   
+  def testing
+  #  @token = access_token
+    random_integer = rand(1..100)
+    render json: {
+      integer: random_integer
+    }
+  #  logger.info JWT.decode @token,Rails.application.secrets.secret_key_base, true, {algorithm: 'HS256'}
+
+    #render json: {
+    #  integer: random_integer,
+    #  user: current_user.email
+    #}
+  end
+
 end
