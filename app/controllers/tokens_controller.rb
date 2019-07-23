@@ -1,5 +1,5 @@
 class TokensController < ApplicationController
-  before_action :auth_user
+  before_action :auth_user                        # auth_user is similar to current_user
 
   def create
     @user = User.find_by(email: params[:email])
@@ -20,8 +20,7 @@ class TokensController < ApplicationController
   #  @token = access_token
     random_integer = rand(1..100)
     render json: {
-      integer: random_integer,
-      user: auth_user
+      integer: random_integer
     }
   #  logger.info JWT.decode @token,Rails.application.secrets.secret_key_base, true, {algorithm: 'HS256'}
 
